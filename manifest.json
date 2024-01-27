@@ -1,6 +1,6 @@
 {
 	"name": "QuickQuitToMenu",
-	"version_number": "1.0.0",
+	"version_number": "1.0.1",
 	"website_url": "https://github.com/taffyko/LCQuickQuitToMenu",
 	"description": "Instantly quit to the main menu with Ctrl-Alt-Shift-Q, even at times when you are soft-locked or unable to access the pause menu.",
 	"dependencies": [
