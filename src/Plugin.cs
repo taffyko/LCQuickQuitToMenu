@@ -50,14 +50,12 @@ public partial class Plugin : BaseUnityPlugin {
 public class QuickQuitToMenuBehaviour : MonoBehaviour {
     internal static QuickQuitToMenuBehaviour? instance;
     static bool pressedNow;
-    static bool wasPressed;
     internal int tries = 0;
     void Update() {
         HandleHotkey();
     }
 
     public void HandleHotkey() {
-        pressedNow = false;
         if (
             Keyboard.current.ctrlKey.IsPressed()
             && Keyboard.current.altKey.IsPressed()
@@ -67,8 +65,7 @@ public class QuickQuitToMenuBehaviour : MonoBehaviour {
                 return key.keyCode == Plugin.QuitKey.Value;
             });
             if (c != null && c.IsPressed()) {
-                pressedNow = true;
-                if (!wasPressed) {
+                if (!pressedNow) {
                     Plugin.log.LogInfo("QuickQuitToMenu hotkey pressed");
                     if (tries < 5 && NetworkManager.Singleton.IsConnectedClient && SceneManager.GetActiveScene().name != "MainMenu") {
                         // If in-game, try to disconnect cleanly (unless "quit to menu" gets mashed five times in a row)
@@ -79,16 +76,20 @@ public class QuickQuitToMenuBehaviour : MonoBehaviour {
                         tries = 0;
                         Plugin.log.LogInfo("Returning to title screen");
                         if (GameNetworkManager.Instance != null) {
-                            NetworkManager.Singleton.Shutdown();
+                            try { NetworkManager.Singleton.Shutdown(); } catch {}
                             var reset = typeof(GameNetworkManager).GetMethod("ResetGameValuesToDefault", BindingFlags.Instance | BindingFlags.NonPublic);
                             reset.Invoke(GameNetworkManager.Instance, new object[] {});
                         }
                         SceneManager.LoadScene("MainMenu");
                     }
                 }
+                pressedNow = true;
+            } else {
+                pressedNow = false;
             }
+        } else {
+            pressedNow = false;
         }
-        wasPressed = pressedNow;
     }
 }
 
